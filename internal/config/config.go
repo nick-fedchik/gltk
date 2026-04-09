@@ -97,9 +97,10 @@ type KeyringSource struct {
 
 // Context binds an instance to an auth.
 type Context struct {
-	Name     string `yaml:"name"`
-	Instance string `yaml:"instance"`
-	Auth     string `yaml:"auth"`
+	Name           string `yaml:"name"`
+	Instance       string `yaml:"instance"`
+	Auth           string `yaml:"auth"`
+	DefaultProject string `yaml:"default-project,omitempty"`
 }
 
 // Load resolves configuration from env vars and config file.
@@ -117,6 +118,9 @@ func Load() (*Config, error) {
 		}
 		if cfg.Token == "" {
 			cfg.Token = resolved.Token
+		}
+		if cfg.ProjectID == "" {
+			cfg.ProjectID = resolved.ProjectID
 		}
 	}
 
@@ -167,6 +171,9 @@ func (cf *ConfigFile) resolve() *Config {
 	}
 	if auth != nil {
 		cfg.Token = resolveToken(auth)
+	}
+	if ctx.DefaultProject != "" {
+		cfg.ProjectID = ctx.DefaultProject
 	}
 	return cfg
 }

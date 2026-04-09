@@ -79,6 +79,7 @@ contexts:
   - name: default
     instance: gitlab-com
     auth: token-from-env
+    default-project: ""  # e.g. namespace/project-name
 
   # - name: work
   #   instance: company

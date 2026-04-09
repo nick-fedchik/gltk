@@ -10,7 +10,7 @@ func newProjectCmd() *cobra.Command {
 		Use:   "project",
 		Short: "View and query GitLab projects",
 	}
-	cmd.AddCommand(newProjectListCmd(), newProjectGetCmd(), newProjectByPathCmd())
+	cmd.AddCommand(newProjectListCmd(), newProjectGetCmd(), newProjectByPathCmd(), newProjectMembersCmd())
 	return cmd
 }
 
@@ -38,6 +38,19 @@ func newProjectGetCmd() *cobra.Command {
 	}
 	cmd.Flags().IntVar(&projectID, "id", 0, "Project ID (required)")
 	_ = cmd.MarkFlagRequired("id")
+	return cmd
+}
+
+func newProjectMembersCmd() *cobra.Command {
+	var projectID string
+	cmd := &cobra.Command{
+		Use:   "members",
+		Short: "List members of a project",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return project.Members(mustConfig(cmd), projectID)
+		},
+	}
+	cmd.Flags().StringVar(&projectID, "project", "", "Project ID or path (default: from config)")
 	return cmd
 }
 
