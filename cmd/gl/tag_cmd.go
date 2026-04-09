@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/tag"
+	"github.com/spf13/cobra"
 )
 
 func newTagCmd() *cobra.Command {
@@ -20,11 +20,15 @@ func newTagListCmd() *cobra.Command {
 		Use:   "list",
 		Short: "List repository tags",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return tag.List(mustConfig(cmd), project)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return tag.List(cfg, p)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
-	_ = cmd.MarkFlagRequired("project")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	return cmd
 }
 
@@ -34,14 +38,18 @@ func newTagCreateCmd() *cobra.Command {
 		Use:   "create",
 		Short: "Create a tag",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return tag.Create(mustConfig(cmd), project, tagName, ref, message)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return tag.Create(cfg, p, tagName, ref, message)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&tagName, "tag", "", "Tag name (required)")
 	cmd.Flags().StringVar(&ref, "ref", "main", "Ref to tag")
 	cmd.Flags().StringVar(&message, "message", "", "Tag message")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("tag")
 	return cmd
 }
@@ -52,12 +60,16 @@ func newTagDeleteCmd() *cobra.Command {
 		Use:   "delete",
 		Short: "Delete a tag",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return tag.Delete(mustConfig(cmd), project, tagName)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return tag.Delete(cfg, p, tagName)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&tagName, "tag", "", "Tag name (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("tag")
 	return cmd
 }

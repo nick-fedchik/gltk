@@ -24,7 +24,7 @@ type CommitSpec struct {
 	Actions []ActionSpec `json:"actions"`
 }
 
-func Create(cfg *config.Config, projectID int, specFile string) error {
+func Create(cfg *config.Config, projectID interface{}, specFile string) error {
 	// Read commit spec
 	data, err := os.ReadFile(specFile)
 	if err != nil {

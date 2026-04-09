@@ -21,15 +21,17 @@ func newSearchIssuesCmd() *cobra.Command {
 		Use:   "issues",
 		Short: "Search issues",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return search.Issues(mustConfig(cmd), project, text, state, page, perPage)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil { return err }
+			return search.Issues(cfg, p, text, state, page, perPage)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&text, "search", "", "Search text")
 	cmd.Flags().StringVar(&state, "state", "opened", "State: opened, closed, all")
 	cmd.Flags().IntVar(&page, "page", 1, "Page number")
 	cmd.Flags().IntVar(&perPage, "per-page", 20, "Results per page")
-	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -40,14 +42,16 @@ func newSearchMRsCmd() *cobra.Command {
 		Use:   "mrs",
 		Short: "Search merge requests",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return search.MRs(mustConfig(cmd), project, text, state, page, perPage)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil { return err }
+			return search.MRs(cfg, p, text, state, page, perPage)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&text, "search", "", "Search text")
 	cmd.Flags().StringVar(&state, "state", "opened", "State: opened, closed, merged, all")
 	cmd.Flags().IntVar(&page, "page", 1, "Page number")
 	cmd.Flags().IntVar(&perPage, "per-page", 20, "Results per page")
-	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }

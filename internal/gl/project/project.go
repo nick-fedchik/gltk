@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	glclient "gitlab.com/gitlab-org/api/client-go"
 	"github.com/gltk/gltk/internal/config"
+	glclient "gitlab.com/gitlab-org/api/client-go"
 )
 
 func List(cfg *config.Config, groupID int) error {

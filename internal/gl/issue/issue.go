@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	glclient "gitlab.com/gitlab-org/api/client-go"
 	"github.com/gltk/gltk/internal/config"
+	glclient "gitlab.com/gitlab-org/api/client-go"
 )
 
-func List(cfg *config.Config, projectID int, state string, page, perPage int) error {
+func List(cfg *config.Config, projectID interface{}, state string, page, perPage int) error {
 	client, err := cfg.NewGitLabClient()
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func List(cfg *config.Config, projectID int, state string, page, perPage int) er
 	return nil
 }
 
-func Create(cfg *config.Config, projectID int, title, description, labels string, milestone int, assigneeIDs []int64) error {
+func Create(cfg *config.Config, projectID interface{}, title, description, labels string, milestone int, assigneeIDs []int64) error {
 	client, err := cfg.NewGitLabClient()
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func Create(cfg *config.Config, projectID int, title, description, labels string
 	return nil
 }
 
-func Close(cfg *config.Config, projectID, iid int) error {
+func Close(cfg *config.Config, projectID interface{}, iid int) error {
 	client, err := cfg.NewGitLabClient()
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func Close(cfg *config.Config, projectID, iid int) error {
 	return nil
 }
 
-func Batch(cfg *config.Config, projectID int, filePath string) error {
+func Batch(cfg *config.Config, projectID interface{}, filePath string) error {
 	client, err := cfg.NewGitLabClient()
 	if err != nil {
 		return err

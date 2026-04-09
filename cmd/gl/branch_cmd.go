@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/branch"
+	"github.com/spf13/cobra"
 )
 
 func newBranchCmd() *cobra.Command {
@@ -27,13 +27,17 @@ func newBranchListCmd() *cobra.Command {
 		Use:   "list",
 		Short: "List branches",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return branch.List(mustConfig(cmd), project, page, perPage)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return branch.List(cfg, p, page, perPage)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&page, "page", 1, "Page number")
 	cmd.Flags().IntVar(&perPage, "per-page", 20, "Results per page")
-	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -43,12 +47,16 @@ func newBranchGetCmd() *cobra.Command {
 		Use:   "get",
 		Short: "Get branch details",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return branch.Get(mustConfig(cmd), project, branchName)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return branch.Get(cfg, p, branchName)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&branchName, "branch", "", "Branch name (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("branch")
 	return cmd
 }
@@ -59,13 +67,17 @@ func newBranchCreateCmd() *cobra.Command {
 		Use:   "create",
 		Short: "Create a new branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return branch.Create(mustConfig(cmd), project, branchName, ref)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return branch.Create(cfg, p, branchName, ref)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&branchName, "branch", "", "New branch name (required)")
 	cmd.Flags().StringVar(&ref, "ref", "main", "Reference to branch from")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("branch")
 	return cmd
 }
@@ -76,12 +88,16 @@ func newBranchDeleteCmd() *cobra.Command {
 		Use:   "delete",
 		Short: "Delete a branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return branch.Delete(mustConfig(cmd), project, branchName)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return branch.Delete(cfg, p, branchName)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&branchName, "branch", "", "Branch name (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("branch")
 	return cmd
 }
@@ -92,12 +108,16 @@ func newBranchProtectCmd() *cobra.Command {
 		Use:   "protect",
 		Short: "Protect a branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return branch.Protect(mustConfig(cmd), project, branchName)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return branch.Protect(cfg, p, branchName)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&branchName, "branch", "", "Branch name (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("branch")
 	return cmd
 }

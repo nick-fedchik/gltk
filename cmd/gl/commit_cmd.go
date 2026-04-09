@@ -15,18 +15,20 @@ func newCommitCmd() *cobra.Command {
 }
 
 func newCommitCreateCmd() *cobra.Command {
-	var projectID int
+	var project string
 	var specFile string
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a commit from a JSON spec file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return commit.Create(mustConfig(cmd), projectID, specFile)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil { return err }
+			return commit.Create(cfg, p, specFile)
 		},
 	}
-	cmd.Flags().IntVar(&projectID, "project", 0, "Project ID (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&specFile, "file", "", "JSON spec file path (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("file")
 	return cmd
 }

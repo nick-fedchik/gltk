@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/mr"
+	"github.com/spf13/cobra"
 )
 
 func newMRCmd() *cobra.Command {
@@ -28,14 +28,18 @@ func newMRListCmd() *cobra.Command {
 		Use:   "list",
 		Short: "List merge requests",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return mr.List(mustConfig(cmd), project, state, page, perPage)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return mr.List(cfg, p, state, page, perPage)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&state, "state", "opened", "MR state: opened, closed, merged, all")
 	cmd.Flags().IntVar(&page, "page", 1, "Page number")
 	cmd.Flags().IntVar(&perPage, "per-page", 20, "Results per page")
-	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -46,12 +50,16 @@ func newMRGetCmd() *cobra.Command {
 		Use:   "get",
 		Short: "Get merge request details",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return mr.Get(mustConfig(cmd), project, mrIID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return mr.Get(cfg, p, mrIID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&mrIID, "mr", 0, "MR IID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("mr")
 	return cmd
 }
@@ -62,15 +70,19 @@ func newMRCreateCmd() *cobra.Command {
 		Use:   "create",
 		Short: "Create a merge request",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return mr.Create(mustConfig(cmd), project, title, source, target, description)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return mr.Create(cfg, p, title, source, target, description)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&title, "title", "", "MR title (required)")
 	cmd.Flags().StringVar(&source, "source", "", "Source branch (required)")
 	cmd.Flags().StringVar(&target, "target", "main", "Target branch")
 	cmd.Flags().StringVar(&description, "description", "", "MR description")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("title")
 	_ = cmd.MarkFlagRequired("source")
 	return cmd
@@ -84,13 +96,17 @@ func newMRMergeCmd() *cobra.Command {
 		Use:   "merge",
 		Short: "Merge a merge request",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return mr.Merge(mustConfig(cmd), project, mrIID, message)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return mr.Merge(cfg, p, mrIID, message)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&mrIID, "mr", 0, "MR IID (required)")
 	cmd.Flags().StringVar(&message, "message", "", "Merge commit message")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("mr")
 	return cmd
 }
@@ -102,12 +118,16 @@ func newMRCloseCmd() *cobra.Command {
 		Use:   "close",
 		Short: "Close a merge request",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return mr.Close(mustConfig(cmd), project, mrIID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return mr.Close(cfg, p, mrIID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&mrIID, "mr", 0, "MR IID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("mr")
 	return cmd
 }
@@ -119,13 +139,17 @@ func newMRCommentCmd() *cobra.Command {
 		Use:   "comment",
 		Short: "Add a comment to a merge request",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return mr.Comment(mustConfig(cmd), project, mrIID, body)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return mr.Comment(cfg, p, mrIID, body)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&mrIID, "mr", 0, "MR IID (required)")
 	cmd.Flags().StringVar(&body, "body", "", "Comment body (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("mr")
 	_ = cmd.MarkFlagRequired("body")
 	return cmd

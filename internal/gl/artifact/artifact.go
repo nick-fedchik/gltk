@@ -11,10 +11,10 @@ import (
 	"github.com/gltk/gltk/internal/config"
 )
 
-func List(cfg *config.Config, projectID, jobID, page, perPage int) error {
+func List(cfg *config.Config, projectID string, jobID, page, perPage int) error {
 	// If jobID specified, get artifact for that job
 	if jobID != 0 {
-		url := fmt.Sprintf("%s/api/v4/projects/%d/jobs/%d", cfg.GitLabURL, projectID, jobID)
+		url := fmt.Sprintf("%s/api/v4/projects/%s/jobs/%d", cfg.GitLabURL, projectID, jobID)
 		resp, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create request: %w", err)
@@ -59,7 +59,7 @@ func List(cfg *config.Config, projectID, jobID, page, perPage int) error {
 	}
 
 	// Otherwise list jobs with artifacts
-	url := fmt.Sprintf("%s/api/v4/projects/%d/jobs?page=%d&per_page=%d&status=success", cfg.GitLabURL, projectID, page, perPage)
+	url := fmt.Sprintf("%s/api/v4/projects/%s/jobs?page=%d&per_page=%d&status=success", cfg.GitLabURL, projectID, page, perPage)
 	resp, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -112,9 +112,9 @@ func List(cfg *config.Config, projectID, jobID, page, perPage int) error {
 	return nil
 }
 
-func Download(cfg *config.Config, projectID, jobID int, outputPath string) error {
+func Download(cfg *config.Config, projectID string, jobID int, outputPath string) error {
 	// Construct download URL
-	downloadURL := fmt.Sprintf("%s/api/v4/projects/%d/jobs/%d/artifacts", cfg.GitLabURL, projectID, jobID)
+	downloadURL := fmt.Sprintf("%s/api/v4/projects/%s/jobs/%d/artifacts", cfg.GitLabURL, projectID, jobID)
 
 	// Determine output filename
 	if outputPath == "" {
@@ -161,9 +161,9 @@ func Download(cfg *config.Config, projectID, jobID int, outputPath string) error
 	return nil
 }
 
-func Delete(cfg *config.Config, projectID, jobID int) error {
+func Delete(cfg *config.Config, projectID string, jobID int) error {
 	// Construct delete URL
-	deleteURL := fmt.Sprintf("%s/api/v4/projects/%d/jobs/%d/artifacts", cfg.GitLabURL, projectID, jobID)
+	deleteURL := fmt.Sprintf("%s/api/v4/projects/%s/jobs/%d/artifacts", cfg.GitLabURL, projectID, jobID)
 
 	// Create DELETE request
 	req, err := http.NewRequest("DELETE", deleteURL, nil)

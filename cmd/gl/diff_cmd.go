@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/diff"
+	"github.com/spf13/cobra"
 )
 
 func newDiffCmd() *cobra.Command {
@@ -21,12 +21,16 @@ func newDiffSummaryCmd() *cobra.Command {
 		Use:   "summary",
 		Short: "Show MR diff summary",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return diff.Summary(mustConfig(cmd), project, mr)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return diff.Summary(cfg, p, mr)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&mr, "mr", 0, "MR IID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("mr")
 	return cmd
 }

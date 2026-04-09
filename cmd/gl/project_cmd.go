@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/project"
+	"github.com/spf13/cobra"
 )
 
 func newProjectCmd() *cobra.Command {

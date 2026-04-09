@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/pipeline"
+	"github.com/spf13/cobra"
 )
 
 func newPipelineCmd() *cobra.Command {
@@ -32,13 +32,17 @@ func newPipelineListCmd() *cobra.Command {
 		Use:   "list",
 		Short: "List pipelines",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.List(mustConfig(cmd), project, status, page)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.List(cfg, p, status, page)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&status, "status", "", "Filter by status: running, success, failed, cancelled")
 	cmd.Flags().IntVar(&page, "page", 1, "Page number")
-	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -49,12 +53,16 @@ func newPipelineJobsCmd() *cobra.Command {
 		Use:   "jobs",
 		Short: "List jobs in a pipeline",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.Jobs(mustConfig(cmd), project, pipelineID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.Jobs(cfg, p, pipelineID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	return cmd
 }
@@ -66,12 +74,16 @@ func newPipelineWatchCmd() *cobra.Command {
 		Use:   "watch",
 		Short: "Watch pipeline until completion",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.Watch(mustConfig(cmd), project, pipelineID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.Watch(cfg, p, pipelineID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	return cmd
 }
@@ -83,13 +95,17 @@ func newPipelineTraceCmd() *cobra.Command {
 		Use:   "trace",
 		Short: "Get job trace/log",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.Trace(mustConfig(cmd), project, jobID, output)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.Trace(cfg, p, jobID, output)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
 	cmd.Flags().StringVar(&output, "output", "", "Save trace to file (default: stdout)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("job")
 	return cmd
 }
@@ -101,12 +117,16 @@ func newPipelineCancelCmd() *cobra.Command {
 		Use:   "cancel",
 		Short: "Cancel a running pipeline",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.Cancel(mustConfig(cmd), project, pipelineID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.Cancel(cfg, p, pipelineID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	return cmd
 }
@@ -117,13 +137,17 @@ func newPipelineCreateCmd() *cobra.Command {
 		Use:   "create",
 		Short: "Create a new pipeline",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.Create(mustConfig(cmd), project, ref, vars)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.Create(cfg, p, ref, vars)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().StringVar(&ref, "ref", "main", "Git reference: branch/tag/commit")
 	cmd.Flags().StringVar(&vars, "vars", "", "Variables as KEY=VALUE,KEY2=VALUE2")
-	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -134,13 +158,17 @@ func newPipelineTriggerJobCmd() *cobra.Command {
 		Use:   "trigger-job",
 		Short: "Trigger a manual job in a pipeline",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.TriggerJob(mustConfig(cmd), project, pipelineID, jobName)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.TriggerJob(cfg, p, pipelineID, jobName)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
 	cmd.Flags().StringVar(&jobName, "job", "", "Job name to trigger (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	_ = cmd.MarkFlagRequired("job")
 	return cmd
@@ -154,13 +182,17 @@ func newPipelineTestReportCmd() *cobra.Command {
 		Use:   "test-report",
 		Short: "Show test results for a pipeline (JUnit)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.TestReport(mustConfig(cmd), project, pipelineID, failedOnly)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.TestReport(cfg, p, pipelineID, failedOnly)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
 	cmd.Flags().BoolVar(&failedOnly, "failed", false, "Show only failed/errored tests")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	return cmd
 }
@@ -172,12 +204,16 @@ func newPipelineTestSummaryCmd() *cobra.Command {
 		Use:   "test-summary",
 		Short: "Show test suite summary for a pipeline",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.TestReportSummary(mustConfig(cmd), project, pipelineID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.TestReportSummary(cfg, p, pipelineID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	return cmd
 }
@@ -189,12 +225,16 @@ func newPipelineCoverageCmd() *cobra.Command {
 		Use:   "coverage",
 		Short: "Show code coverage for a pipeline and its jobs",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pipeline.Coverage(mustConfig(cmd), project, pipelineID)
+			cfg := mustConfig(cmd)
+			p, err := resolveProject(cfg, project)
+			if err != nil {
+				return err
+			}
+			return pipeline.Coverage(cfg, p, pipelineID)
 		},
 	}
-	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (required)")
+	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
 	cmd.Flags().IntVar(&pipelineID, "pipeline", 0, "Pipeline ID (required)")
-	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("pipeline")
 	return cmd
 }

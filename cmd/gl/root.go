@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/config"
+	"github.com/spf13/cobra"
 )
 
 func NewRootCmd() *cobra.Command {
@@ -61,4 +62,17 @@ func mustConfig(cmd *cobra.Command) *config.Config {
 		cfg.Token = token
 	}
 	return cfg
+}
+
+// resolveProject returns the project from the flag, falling back to cfg.ProjectID.
+// Returns an error if neither is set.
+func resolveProject(cfg *config.Config, flagValue string) (string, error) {
+	p := strings.TrimRight(flagValue, "/")
+	if p == "" {
+		p = strings.TrimRight(cfg.ProjectID, "/")
+	}
+	if p == "" {
+		return "", fmt.Errorf("project is required: use --project flag or set default-project in config.yaml")
+	}
+	return p, nil
 }
