@@ -35,11 +35,12 @@ func newIssueListCmd() *cobra.Command {
 func newIssueCreateCmd() *cobra.Command {
 	var projectID, milestone int
 	var title, description, labels string
+	var assignees []int64
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a new issue",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return issue.Create(mustConfig(cmd), projectID, title, description, labels, milestone)
+			return issue.Create(mustConfig(cmd), projectID, title, description, labels, milestone, assignees)
 		},
 	}
 	cmd.Flags().IntVar(&projectID, "project", 0, "Project ID (required)")
@@ -47,6 +48,7 @@ func newIssueCreateCmd() *cobra.Command {
 	cmd.Flags().StringVar(&description, "description", "", "Issue description")
 	cmd.Flags().StringVar(&labels, "labels", "", "Comma-separated labels")
 	cmd.Flags().IntVar(&milestone, "milestone", 0, "Milestone ID")
+	cmd.Flags().Int64SliceVar(&assignees, "assignee", nil, "Assignee user ID (repeatable for multiple)")
 	_ = cmd.MarkFlagRequired("project")
 	_ = cmd.MarkFlagRequired("title")
 	return cmd

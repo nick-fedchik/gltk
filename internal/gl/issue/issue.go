@@ -41,7 +41,7 @@ func List(cfg *config.Config, projectID int, state string, page, perPage int) er
 	return nil
 }
 
-func Create(cfg *config.Config, projectID int, title, description, labels string, milestone int) error {
+func Create(cfg *config.Config, projectID int, title, description, labels string, milestone int, assigneeIDs []int64) error {
 	client, err := cfg.NewGitLabClient()
 	if err != nil {
 		return err
@@ -65,12 +65,23 @@ func Create(cfg *config.Config, projectID int, title, description, labels string
 		opts.MilestoneID = &m
 	}
 
+	if len(assigneeIDs) > 0 {
+		opts.AssigneeIDs = &assigneeIDs
+	}
+
 	issue, _, err := client.Issues.CreateIssue(projectID, opts)
 	if err != nil {
 		return fmt.Errorf("failed to create issue: %w", err)
 	}
 
 	fmt.Printf("✅ Created issue #%d: %s\n", issue.IID, issue.Title)
+	if len(issue.Assignees) > 0 {
+		names := make([]string, len(issue.Assignees))
+		for i, a := range issue.Assignees {
+			names[i] = a.Username
+		}
+		fmt.Printf("   Assigned to: %s\n", strings.Join(names, ", "))
+	}
 	return nil
 }
 

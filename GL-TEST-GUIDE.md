@@ -143,6 +143,36 @@ Pipeline #123 — Coverage
 
 ---
 
+## Creating Issues with Assignees
+
+Create issues and assign them to specific users:
+
+```bash
+# Get user IDs first
+gl user list --project=GROUP/PROJECT
+
+# Create and assign to single user
+gl issue create --project=GROUP/PROJECT --title="Fix failing test" --assignee=42
+
+# Create and assign to multiple users (GitLab EE)
+gl issue create --project=GROUP/PROJECT --title="Fix failing test" --assignee=42 --assignee=55
+
+# With description and labels
+gl issue create --project=GROUP/PROJECT \
+  --title="Fix failing test" \
+  --description="Failing test: TestUserAuth > should reject expired token" \
+  --labels="bug,test-failure" \
+  --assignee=42
+```
+
+Output:
+```
+✅ Created issue #456: Fix failing test
+   Assigned to: john_doe, jane_smith
+```
+
+---
+
 ## API Reference
 
 | Command | GitLab API | Response size |
