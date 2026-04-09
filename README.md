@@ -34,6 +34,11 @@ gl auth
 gl issue list --project=mygroup/myproject
 gl mr list --project=mygroup/myproject --state=opened
 gl pipeline list --project=mygroup/myproject
+
+# Or set a default project in config.yaml to skip --project on every command:
+gl issue list
+gl mr list --state=opened
+gl pipeline list
 ```
 
 ## Configuration
@@ -88,6 +93,7 @@ contexts:
   - name: default
     instance: gitlab-com
     auth: my-token
+    default-project: "mygroup/myproject"  # optional — makes --project flag optional
 ```
 
 ### Authentication methods
@@ -170,6 +176,7 @@ contexts:
   - name: work
     instance: company
     auth: work-token
+    default-project: "team/myapp"   # optional default project for this context
 ```
 
 Switch context by editing `current-context`, or override per-command:
@@ -200,8 +207,12 @@ Create a Personal Access Token at **Settings > Access Tokens** in your GitLab in
 ```bash
 gl issue list    --project=GROUP/PROJECT [--state=opened|closed]
 gl issue create  --project=GROUP/PROJECT --title="Bug report" [--description="..."] [--labels="bug,urgent"]
+                 [--assignee=USERNAME] [--assignee=USERNAME2]    # by username (resolved to ID automatically)
+                 [--assignee-id=42] [--assignee-id=55]           # by numeric user ID
 gl issue close   --project=GROUP/PROJECT --issue=42
 gl issue batch   --project=GROUP/PROJECT --file=issues.json
+
+# --project is optional on all commands when default-project is set in config.yaml
 ```
 
 ### Merge Requests
@@ -210,6 +221,7 @@ gl issue batch   --project=GROUP/PROJECT --file=issues.json
 gl mr list       --project=GROUP/PROJECT [--state=opened|merged|closed]
 gl mr get        --project=GROUP/PROJECT --mr=15
 gl mr create     --project=GROUP/PROJECT --source=feature --target=main --title="Add feature"
+                 [--assignee=USERNAME] [--assignee-id=42]        # assign by username or ID
 gl mr merge      --project=GROUP/PROJECT --mr=15
 gl mr close      --project=GROUP/PROJECT --mr=15
 gl mr comment    --project=GROUP/PROJECT --mr=15 --body="LGTM"
@@ -358,8 +370,9 @@ gl runner update   --runner=10 --description="Updated"
 ### Other
 
 ```bash
-gl auth              # Test authentication and connectivity
-gl project list      # List accessible projects
+gl auth                  # Test authentication and connectivity
+gl project list          # List accessible projects (membership)
+gl project members       # List project members with access levels
 gl search issues     --query="login bug" --project=GROUP/PROJECT
 gl search mrs        --query="refactor" --project=GROUP/PROJECT
 gl report            # Generate project reports

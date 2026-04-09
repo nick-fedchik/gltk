@@ -66,6 +66,8 @@ func newMRGetCmd() *cobra.Command {
 
 func newMRCreateCmd() *cobra.Command {
 	var project, title, source, target, description string
+	var assigneeIDs []int64
+	var assigneeUsernames []string
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a merge request",
@@ -75,7 +77,7 @@ func newMRCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return mr.Create(cfg, p, title, source, target, description)
+			return mr.Create(cfg, p, title, source, target, description, assigneeIDs, assigneeUsernames)
 		},
 	}
 	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
@@ -83,6 +85,8 @@ func newMRCreateCmd() *cobra.Command {
 	cmd.Flags().StringVar(&source, "source", "", "Source branch (required)")
 	cmd.Flags().StringVar(&target, "target", "main", "Target branch")
 	cmd.Flags().StringVar(&description, "description", "", "MR description")
+	cmd.Flags().Int64SliceVar(&assigneeIDs, "assignee-id", nil, "Assignee by user ID (repeatable)")
+	cmd.Flags().StringSliceVar(&assigneeUsernames, "assignee", nil, "Assignee by username (repeatable)")
 	_ = cmd.MarkFlagRequired("title")
 	_ = cmd.MarkFlagRequired("source")
 	return cmd

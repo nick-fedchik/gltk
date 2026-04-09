@@ -145,24 +145,36 @@ Pipeline #123 — Coverage
 
 ## Creating Issues with Assignees
 
-Create issues and assign them to specific users:
+Create issues and assign them to specific users. Two flag variants are supported:
+
+| Flag | Type | Description |
+|------|------|-------------|
+| `--assignee USERNAME` | string (repeatable) | Assign by GitLab username — ID is resolved automatically via API |
+| `--assignee-id ID` | int64 (repeatable) | Assign by numeric user ID |
+
+Both flags can be combined in a single command.
 
 ```bash
-# Get user IDs first
-gl user list --project=GROUP/PROJECT
+# Assign by username (username is resolved to user ID automatically)
+gl issue create --project=GROUP/PROJECT --title="Fix failing test" --assignee=john_doe
 
-# Create and assign to single user
-gl issue create --project=GROUP/PROJECT --title="Fix failing test" --assignee=42
+# Assign to multiple users by username
+gl issue create --project=GROUP/PROJECT --title="Fix failing test" \
+  --assignee=john_doe --assignee=jane_smith
 
-# Create and assign to multiple users (GitLab EE)
-gl issue create --project=GROUP/PROJECT --title="Fix failing test" --assignee=42 --assignee=55
+# Assign by numeric user ID
+gl issue create --project=GROUP/PROJECT --title="Fix failing test" --assignee-id=42
 
-# With description and labels
+# Mix — some by username, some by ID
+gl issue create --project=GROUP/PROJECT --title="Fix failing test" \
+  --assignee=john_doe --assignee-id=55
+
+# Full example with description and labels
 gl issue create --project=GROUP/PROJECT \
   --title="Fix failing test" \
   --description="Failing test: TestUserAuth > should reject expired token" \
   --labels="bug,test-failure" \
-  --assignee=42
+  --assignee=john_doe
 ```
 
 Output:
@@ -170,6 +182,11 @@ Output:
 ✅ Created issue #456: Fix failing test
    Assigned to: john_doe, jane_smith
 ```
+
+> **Tip:** If `default-project` is set in `config.yaml`, the `--project` flag can be omitted:
+> ```bash
+> gl issue create --title="Fix failing test" --assignee=john_doe
+> ```
 
 ---
 

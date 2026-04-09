@@ -41,11 +41,39 @@ func List(cfg *config.Config, projectID interface{}, state string, page, perPage
 	return nil
 }
 
-func Create(cfg *config.Config, projectID interface{}, title, description, labels string, milestone int, assigneeIDs []int64) error {
+func resolveUsernamesToIDs(cfg *config.Config, usernames []string) ([]int64, error) {
+	if len(usernames) == 0 {
+		return nil, nil
+	}
+	client, err := cfg.NewGitLabClient()
+	if err != nil {
+		return nil, err
+	}
+	var ids []int64
+	for _, u := range usernames {
+		users, _, err := client.Users.ListUsers(&glclient.ListUsersOptions{Username: glclient.Ptr(u)})
+		if err != nil {
+			return nil, fmt.Errorf("failed to look up user %q: %w", u, err)
+		}
+		if len(users) == 0 {
+			return nil, fmt.Errorf("user not found: %q", u)
+		}
+		ids = append(ids, users[0].ID)
+	}
+	return ids, nil
+}
+
+func Create(cfg *config.Config, projectID interface{}, title, description, labels string, milestone int, assigneeIDs []int64, assigneeUsernames []string) error {
 	client, err := cfg.NewGitLabClient()
 	if err != nil {
 		return err
 	}
+
+	resolvedIDs, err := resolveUsernamesToIDs(cfg, assigneeUsernames)
+	if err != nil {
+		return err
+	}
+	allAssigneeIDs := append(assigneeIDs, resolvedIDs...)
 
 	opts := &glclient.CreateIssueOptions{
 		Title: &title,
@@ -65,8 +93,8 @@ func Create(cfg *config.Config, projectID interface{}, title, description, label
 		opts.MilestoneID = &m
 	}
 
-	if len(assigneeIDs) > 0 {
-		opts.AssigneeIDs = &assigneeIDs
+	if len(allAssigneeIDs) > 0 {
+		opts.AssigneeIDs = &allAssigneeIDs
 	}
 
 	issue, _, err := client.Issues.CreateIssue(projectID, opts)

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/job"
+	"github.com/spf13/cobra"
 )
 
 func newJobCmd() *cobra.Command {
@@ -32,7 +32,9 @@ func newJobAnalyzeCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Analyze(cfg, jobID, p, url)
 		},
 	}
@@ -51,7 +53,9 @@ func newJobLogsCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Logs(cfg, jobID, p, tail)
 		},
 	}
@@ -71,7 +75,9 @@ func newJobRetryCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Retry(cfg, jobID, p)
 		},
 	}
@@ -90,7 +96,9 @@ func newJobStatusCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Status(cfg, jobID, p)
 		},
 	}
@@ -109,7 +117,9 @@ func newJobCancelCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Cancel(cfg, jobID, p)
 		},
 	}
@@ -128,7 +138,9 @@ func newJobTriggerCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Trigger(cfg, jobID, p)
 		},
 	}
@@ -147,7 +159,9 @@ func newJobTraceCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Trace(cfg, jobID, p, outputFile)
 		},
 	}
@@ -167,7 +181,9 @@ func newJobDetailsCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return job.Details(cfg, jobID, p)
 		},
 	}

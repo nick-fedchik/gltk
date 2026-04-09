@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/search"
+	"github.com/spf13/cobra"
 )
 
 func newSearchCmd() *cobra.Command {
@@ -23,7 +23,9 @@ func newSearchIssuesCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return search.Issues(cfg, p, text, state, page, perPage)
 		},
 	}
@@ -44,7 +46,9 @@ func newSearchMRsCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return search.MRs(cfg, p, text, state, page, perPage)
 		},
 	}

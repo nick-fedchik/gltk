@@ -3,8 +3,8 @@ package mr
 import (
 	"fmt"
 
-	glclient "gitlab.com/gitlab-org/api/client-go"
 	"github.com/gltk/gltk/internal/config"
+	glclient "gitlab.com/gitlab-org/api/client-go"
 )
 
 func newClient(cfg *config.Config) (*glclient.Client, error) {
@@ -103,18 +103,49 @@ func Get(cfg *config.Config, project string, mrIID int) error {
 	return nil
 }
 
-func Create(cfg *config.Config, project, title, source, target, description string) error {
+func resolveUsernamesToIDs(cfg *config.Config, usernames []string) ([]int64, error) {
+	if len(usernames) == 0 {
+		return nil, nil
+	}
+	client, err := newClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+	var ids []int64
+	for _, u := range usernames {
+		users, _, err := client.Users.ListUsers(&glclient.ListUsersOptions{Username: glclient.Ptr(u)})
+		if err != nil {
+			return nil, fmt.Errorf("failed to look up user %q: %w", u, err)
+		}
+		if len(users) == 0 {
+			return nil, fmt.Errorf("user not found: %q", u)
+		}
+		ids = append(ids, users[0].ID)
+	}
+	return ids, nil
+}
+
+func Create(cfg *config.Config, project, title, source, target, description string, assigneeIDs []int64, assigneeUsernames []string) error {
 	client, err := newClient(cfg)
 	if err != nil {
 		return err
 	}
 	projectID := getProjectID(project)
 
+	resolvedIDs, err := resolveUsernamesToIDs(cfg, assigneeUsernames)
+	if err != nil {
+		return err
+	}
+	allAssigneeIDs := append(assigneeIDs, resolvedIDs...)
+
 	opts := &glclient.CreateMergeRequestOptions{
 		Title:        glclient.Ptr(title),
 		SourceBranch: glclient.Ptr(source),
 		TargetBranch: glclient.Ptr(target),
 		Description:  glclient.Ptr(description),
+	}
+	if len(allAssigneeIDs) > 0 {
+		opts.AssigneeIDs = &allAssigneeIDs
 	}
 
 	mr, _, err := client.MergeRequests.CreateMergeRequest(projectID, opts)

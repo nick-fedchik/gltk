@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/artifact"
+	"github.com/spf13/cobra"
 )
 
 func newArtifactCmd() *cobra.Command {
@@ -23,7 +23,9 @@ func newArtifactListCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return artifact.List(cfg, p, jobID, page, perPage)
 		},
 	}
@@ -44,7 +46,9 @@ func newArtifactDownloadCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return artifact.Download(cfg, p, jobID, output)
 		},
 	}
@@ -64,7 +68,9 @@ func newArtifactDeleteCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return artifact.Delete(cfg, p, jobID)
 		},
 	}

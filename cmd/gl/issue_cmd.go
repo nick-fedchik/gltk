@@ -41,7 +41,8 @@ func newIssueCreateCmd() *cobra.Command {
 	var project string
 	var milestone int
 	var title, description, labels string
-	var assignees []int64
+	var assigneeIDs []int64
+	var assigneeUsernames []string
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a new issue",
@@ -51,7 +52,7 @@ func newIssueCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return issue.Create(cfg, p, title, description, labels, milestone, assignees)
+			return issue.Create(cfg, p, title, description, labels, milestone, assigneeIDs, assigneeUsernames)
 		},
 	}
 	cmd.Flags().StringVar(&project, "project", "", "Project ID or path (default: from config)")
@@ -59,7 +60,8 @@ func newIssueCreateCmd() *cobra.Command {
 	cmd.Flags().StringVar(&description, "description", "", "Issue description")
 	cmd.Flags().StringVar(&labels, "labels", "", "Comma-separated labels")
 	cmd.Flags().IntVar(&milestone, "milestone", 0, "Milestone ID")
-	cmd.Flags().Int64SliceVar(&assignees, "assignee", nil, "Assignee user ID (repeatable for multiple)")
+	cmd.Flags().Int64SliceVar(&assigneeIDs, "assignee-id", nil, "Assignee by user ID (repeatable)")
+	cmd.Flags().StringSliceVar(&assigneeUsernames, "assignee", nil, "Assignee by username (repeatable)")
 	_ = cmd.MarkFlagRequired("title")
 	return cmd
 }

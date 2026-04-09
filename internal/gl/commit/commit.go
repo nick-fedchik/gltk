@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	glclient "gitlab.com/gitlab-org/api/client-go"
 	"github.com/gltk/gltk/internal/config"
+	glclient "gitlab.com/gitlab-org/api/client-go"
 )
 
 // ActionSpec describes a single file action in a commit.

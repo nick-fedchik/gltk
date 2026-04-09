@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/gltk/gltk/internal/gl/commit"
+	"github.com/spf13/cobra"
 )
 
 func newCommitCmd() *cobra.Command {
@@ -23,7 +23,9 @@ func newCommitCreateCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := mustConfig(cmd)
 			p, err := resolveProject(cfg, project)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 			return commit.Create(cfg, p, specFile)
 		},
 	}
