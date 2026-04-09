@@ -1,0 +1,105 @@
+# gltk configuration — follows the official gitlab.com/config/v1beta1 schema
+# Copy as config.yaml to one of the search locations below.
+#
+# Config file search order:
+#   1. ./config.yaml              — current working directory
+#   2. <bin-dir>/config.yaml      — next to the gl binary
+#   3. .gltk/config.yaml          — project-local config directory
+#   4. ~/.config/gltk/config.yaml — XDG user config
+#
+# Override precedence (first non-empty wins):
+#   CLI flags > Environment vars > config.yaml > defaults
+
+version: gitlab.com/config/v1beta1
+current-context: default
+
+# ─── Instances (GitLab servers) ─────────────────────────────────
+
+instances:
+  - name: gitlab-com
+    server: https://gitlab.com
+    api-version: v4
+
+  # Self-hosted example:
+  # - name: company
+  #   server: https://gitlab.company.com
+  #   api-version: v4
+  #   insecure-skip-tls-verify: false
+  #   rate-limit:
+  #     requests-per-second: 1200
+  #     burst: 120
+
+# ─── Auths (credentials) ───────────────────────────────────────
+#
+# Supported methods:
+#   personal-access-token  — most common, create at Settings > Access Tokens
+#   job-token              — CI/CD pipelines (CI_JOB_TOKEN)
+#   oauth2                 — OAuth2 flow (access-token, refresh-token, client-id)
+#
+# Token sources (where the secret comes from):
+#   token: "glpat-..."          — inline (avoid for shared configs)
+#   token-source:
+#     env-var: GITLAB_TOKEN     — from environment variable
+#     file: ~/.secrets/gl-token — from file (newline trimmed)
+#     keyring:                  — from OS keychain (not yet supported)
+#       service: gltk
+#       user: personal-token
+
+auths:
+  # Option A: Token from environment variable (recommended)
+  - name: token-from-env
+    auth-info:
+      personal-access-token:
+        token-source:
+          env-var: GITLAB_TOKEN
+
+  # Option B: Token from file
+  # - name: token-from-file
+  #   auth-info:
+  #     personal-access-token:
+  #       token-source:
+  #         file: ~/.config/gltk/token
+
+  # Option C: Token inline (use only for local/private configs)
+  # - name: token-inline
+  #   auth-info:
+  #     personal-access-token:
+  #       token: "glpat-xxxxxxxxxxxxxxxxxxxx"
+
+  # Option D: CI/CD job token
+  # - name: ci-job
+  #   auth-info:
+  #     job-token:
+  #       token-source:
+  #         env-var: CI_JOB_TOKEN
+
+# ─── Contexts (instance + auth pairs) ──────────────────────────
+
+contexts:
+  - name: default
+    instance: gitlab-com
+    auth: token-from-env
+
+  # - name: work
+  #   instance: company
+  #   auth: token-from-file
+
+# ─── Preferences (optional) ────────────────────────────────────
+
+# preferences:
+#   retry-max: 5
+#   retry-wait-min: 100s
+#   retry-wait-max: 400s
+
+# ─── Token Scopes Reference ────────────────────────────────────
+#
+# Create at: https://gitlab.com/-/user_settings/personal_access_tokens
+#
+#   read_api          — read-only (list issues, pipelines, MRs)
+#   api               — full read/write (create/close issues, merge MRs)
+#   read_repository   — read files and commits
+#   write_repository  — push commits via API
+#   read_user         — inspect users
+#   sudo              — admin operations (manage users, runners)
+#
+# Recommended minimum: api

@@ -1,0 +1,154 @@
+package main
+
+import (
+	"github.com/spf13/cobra"
+	"github.com/gltk/gltk/internal/gl/job"
+)
+
+func newJobCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "job",
+		Short: "Manage and monitor GitLab CI/CD jobs",
+	}
+	cmd.AddCommand(
+		newJobAnalyzeCmd(),
+		newJobLogsCmd(),
+		newJobRetryCmd(),
+		newJobStatusCmd(),
+		newJobCancelCmd(),
+		newJobTriggerCmd(),
+		newJobTraceCmd(),
+		newJobDetailsCmd(),
+	)
+	return cmd
+}
+
+func newJobAnalyzeCmd() *cobra.Command {
+	var jobID int
+	var project, url string
+	cmd := &cobra.Command{
+		Use:   "analyze",
+		Short: "Analyze a job (status, logs for failed jobs)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Analyze(mustConfig(cmd), jobID, project, url)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	cmd.Flags().StringVar(&url, "url", "", "GitLab job URL (alternative to --job)")
+	return cmd
+}
+
+func newJobLogsCmd() *cobra.Command {
+	var jobID, tail int
+	var project string
+	cmd := &cobra.Command{
+		Use:   "logs",
+		Short: "Show job logs",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Logs(mustConfig(cmd), jobID, project, tail)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	cmd.Flags().IntVar(&tail, "tail", 100, "Number of log lines to show")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
+
+func newJobRetryCmd() *cobra.Command {
+	var jobID int
+	var project string
+	cmd := &cobra.Command{
+		Use:   "retry",
+		Short: "Retry a failed job",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Retry(mustConfig(cmd), jobID, project)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
+
+func newJobStatusCmd() *cobra.Command {
+	var jobID int
+	var project string
+	cmd := &cobra.Command{
+		Use:   "status",
+		Short: "Get job status",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Status(mustConfig(cmd), jobID, project)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
+
+func newJobCancelCmd() *cobra.Command {
+	var jobID int
+	var project string
+	cmd := &cobra.Command{
+		Use:   "cancel",
+		Short: "Cancel a running job",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Cancel(mustConfig(cmd), jobID, project)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
+
+func newJobTriggerCmd() *cobra.Command {
+	var jobID int
+	var project string
+	cmd := &cobra.Command{
+		Use:   "trigger",
+		Short: "Trigger a manual job",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Trigger(mustConfig(cmd), jobID, project)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
+
+func newJobTraceCmd() *cobra.Command {
+	var jobID int
+	var project, outputFile string
+	cmd := &cobra.Command{
+		Use:   "trace",
+		Short: "Get full job trace/log",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Trace(mustConfig(cmd), jobID, project, outputFile)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	cmd.Flags().StringVar(&outputFile, "output", "", "Save trace to file (default: stdout)")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
+
+func newJobDetailsCmd() *cobra.Command {
+	var jobID int
+	var project string
+	cmd := &cobra.Command{
+		Use:   "details",
+		Short: "Show detailed job information",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return job.Details(mustConfig(cmd), jobID, project)
+		},
+	}
+	cmd.Flags().IntVar(&jobID, "job", 0, "Job ID (required)")
+	cmd.Flags().StringVar(&project, "project", "1", "Project ID or path")
+	_ = cmd.MarkFlagRequired("job")
+	return cmd
+}
