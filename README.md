@@ -391,6 +391,16 @@ All commands support these flags:
 | `GITLAB_API_TOKEN` | Personal access token (alternative) |
 | `PRIVATE_TOKEN` | Personal access token (legacy) |
 
+## Authors & Contributors
+
+**Created by:** Nick Fedchyk (@nick-fedchik)
+
+**Developed with assistance from:** Claude AI (Anthropic)
+- Architecture design and feature planning
+- Command implementation and testing
+- Documentation and guides
+- Code review and optimization
+
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
