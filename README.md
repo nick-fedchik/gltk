@@ -406,7 +406,7 @@ All commands support these flags:
 
 ## Authors & Contributors
 
-**Created by:** Nick Fedchyk (@nick-fedchik)
+**Created by:** Mykola Fedchyk (@nick-fedchik)
 
 **Developed with assistance from:** Claude AI (Anthropic)
 - Architecture design and feature planning
