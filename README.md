@@ -417,3 +417,27 @@ All commands support these flags:
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
+
+## Software Bill of Materials
+
+### Direct Dependencies
+
+| Module | Version | License |
+|--------|---------|---------|
+| [spf13/cobra](https://github.com/spf13/cobra) | v1.10.2 | Apache 2.0 |
+| [gitlab-org/api/client-go](https://gitlab.com/gitlab-org/api/client-go) | v1.46.0 | Apache 2.0 |
+| [yaml.v3](https://gopkg.in/yaml.v3) | v3.0.1 | MIT |
+
+### Indirect Dependencies
+
+| Module | License |
+|--------|---------|
+| google/go-querystring | BSD-3-Clause |
+| hashicorp/go-cleanhttp | Mozilla Public License 2.0 |
+| hashicorp/go-retryablehttp | Mozilla Public License 2.0 |
+| inconshreveable/mousetrap | Apache 2.0 |
+| spf13/pflag | BSD-3-Clause |
+| golang.org/x/oauth2 | BSD-3-Clause |
+| golang.org/x/time | BSD-3-Clause |
+
+All dependencies are compatible with Apache 2.0 license.
